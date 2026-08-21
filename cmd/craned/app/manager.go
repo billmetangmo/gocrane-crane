@@ -330,14 +330,16 @@ func initControllers(oomRecorder oom.Recorder, mgr ctrl.Manager, opts *options.O
 			klog.Exit(err, "unable to create controller", "controller", "SubstituteController")
 		}
 
-		if err := (&ehpa.HPAObserverController{
-			Client:     mgr.GetClient(),
-			Scheme:     mgr.GetScheme(),
-			RestMapper: mgr.GetRESTMapper(),
-			Recorder:   mgr.GetEventRecorderFor("hpa-observer-controller"),
-		}).SetupWithManager(mgr); err != nil {
-			klog.Exit(err, "unable to create controller", "controller", "HPAObserverController")
-		}
+		// HPAObserverController disabled: uses autoscaling/v2beta2 which is removed in K8s >= 1.26
+		// This controller only exports HPA metrics and is not needed for EHPA Preview mode
+		// if err := (&ehpa.HPAObserverController{
+		// 	Client:     mgr.GetClient(),
+		// 	Scheme:     mgr.GetScheme(),
+		// 	RestMapper: mgr.GetRESTMapper(),
+		// 	Recorder:   mgr.GetEventRecorderFor("hpa-observer-controller"),
+		// }).SetupWithManager(mgr); err != nil {
+		// 	klog.Exit(err, "unable to create controller", "controller", "HPAObserverController")
+		// }
 
 		if err := (&evpa.EffectiveVPAController{
 			Client:        mgr.GetClient(),
