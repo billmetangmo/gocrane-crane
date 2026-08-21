@@ -1,7 +1,7 @@
 ARG PKGNAME
 
 # Build the manager binary
-FROM golang:1.17.2-alpine as builder
+FROM golang:1.21-alpine AS builder
 
 ARG LDFLAGS
 ARG PKGNAME
@@ -15,6 +15,7 @@ RUN apk add build-base
 # Copy the Go Modules manifests
 COPY go.mod go.mod
 COPY go.sum go.sum
+COPY api api/
 # cache deps before building and copying source so that we don't need to re-download as much
 # and so that source changes don't invalidate our downloaded layer
 RUN if [[ "${BUILD}" != "CI" ]]; then go env -w GOPROXY=https://goproxy.io,direct; fi
