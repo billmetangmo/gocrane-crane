@@ -52,6 +52,7 @@ import (
 	"github.com/gocrane/crane/pkg/recommendation"
 	"github.com/gocrane/crane/pkg/server"
 	serverconfig "github.com/gocrane/crane/pkg/server/config"
+	"github.com/gocrane/crane/pkg/utils"
 	"github.com/gocrane/crane/pkg/utils/target"
 	"github.com/gocrane/crane/pkg/webhooks"
 )
@@ -143,8 +144,7 @@ func Run(ctx context.Context, opts *options.Options) error {
 		}
 	}()
 
-	recommenderMgr := initRecommenderManager(opts)
-	initControllers(podOOMRecorder, mgr, opts, predictorMgr, recommenderMgr, historyDataSources[providers.PrometheusDataSource])
+	initControllers(ctx, podOOMRecorder, mgr, opts, predictorMgr, historyDataSources[providers.PrometheusDataSource])
 	// initialize custom collector metrics
 	initMetricCollector(mgr)
 	runAll(ctx, mgr, predictorMgr, dataSourceProviders[providers.PrometheusDataSource], opts)
@@ -257,6 +257,8 @@ func initDataSources(mgr ctrl.Manager, opts *options.Options) (map[providers.Dat
 			hybridDataSources[providers.PrometheusDataSource] = provider
 			realtimeDataSources[providers.PrometheusDataSource] = provider
 			historyDataSources[providers.PrometheusDataSource] = provider
+
+			utils.SetExtensionLabels(opts.DataSourcePromConfig.ExtensionLabels)
 		}
 	}
 	return realtimeDataSources, historyDataSources, hybridDataSources
@@ -267,7 +269,7 @@ func initPredictorManager(opts *options.Options, realtimeDataSources map[provide
 }
 
 // initControllers setup controllers with manager
-func initControllers(oomRecorder oom.Recorder, mgr ctrl.Manager, opts *options.Options, predictorMgr predictor.Manager, recommenderMgr recommendation.RecommenderManager, historyDataSource providers.History) {
+func initControllers(ctx context.Context, oomRecorder oom.Recorder, mgr ctrl.Manager, opts *options.Options, predictorMgr predictor.Manager, historyDataSource providers.History) {
 	discoveryClientSet, err := discovery.NewDiscoveryClientForConfig(mgr.GetConfig())
 	if err != nil {
 		klog.Exit(err, "Unable to create discover client")
@@ -369,6 +371,8 @@ func initControllers(oomRecorder oom.Recorder, mgr ctrl.Manager, opts *options.O
 
 	// TODO(qmhu), change feature gate from analysis to recommendation
 	if utilfeature.DefaultFeatureGate.Enabled(features.CraneAnalysis) {
+		recommenderMgr := initRecommenderManager(opts)
+
 		if err := (&analytics.Controller{
 			Client: mgr.GetClient(),
 			/*Scheme:        mgr.GetScheme(),
@@ -418,6 +422,13 @@ func initControllers(oomRecorder oom.Recorder, mgr ctrl.Manager, opts *options.O
 		}).SetupWithManager(mgr); err != nil {
 			klog.Exit(err, "unable to create controller", "controller", "RecommendationTriggerController")
 		}
+
+		checker := recommendationctrl.Checker{
+			Client:          mgr.GetClient(),
+			MonitorInterval: opts.MonitorInterval,
+			OutDateInterval: opts.OutDateInterval,
+		}
+		checker.Run(ctx.Done())
 	}
 
 	// CnpController

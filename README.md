@@ -5,7 +5,11 @@
 [![License](https://img.shields.io/github/license/gocrane/crane)](https://www.apache.org/licenses/LICENSE-2.0.html)
 ![GoVersion](https://img.shields.io/github/go-mod/go-version/gocrane/crane)
 
+<div align="center">
+
 <img alt="Crane logo" height="100" src="docs/images/crane.svg" title="Crane" width="200"/>
+
+</div>
 
 ---
 
@@ -15,7 +19,11 @@
 
 Crane is a FinOps Platform for Cloud Resource Analytics and Economics in Kubernetes clusters. The goal is not only help user to manage cloud cost easier but also ensure the quality of applications.
 
+<div align="center">
+
 <img alt="fcs logo" height="200" src="docs/images/Crane-FinOps-Certified-Solution.png" title="FinOps Certified Solution" width="200"/>
+
+</div>
 
 Crane is a [FinOps Certified Solution](https://www.finops.org/certifications/finops-certified-solution/) project of the [FinOps Foundation](https://www.finops.org/).
 
@@ -94,7 +102,7 @@ Full documentation is available on the [Crane website](https://gocrane.io).
 
 - Wechat Group (Chinese): 
 
-<img alt="Wechat" src="https://github.com/gocrane/crane/assets/6251116/fbad292b-3565-414c-bd85-31f65ce4d928" title="Wechat" width="200"/>
+<img alt="Wechat" src="https://github.com/gocrane/crane/assets/6251116/50997b45-187f-4e31-91e2-d679ea2b4bd0" title="Wechat" width="200"/>
 <img alt="Wechat" src="docs/images/wechat.jpeg" title="Wechat" width="200"/>
 Add it and Reply "Crane"，Robot will add you in Wechat group.
 
